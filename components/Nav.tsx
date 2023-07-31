@@ -4,7 +4,13 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { signIn, signOut, useSession, getProviders } from 'next-auth/react';
+import {
+  signIn,
+  signOut,
+  useSession,
+  getProviders,
+  ClientSafeProvider,
+} from 'next-auth/react';
 
 interface Provider {
   name: string | null;
@@ -12,22 +18,24 @@ interface Provider {
 }
 
 const Nav = () => {
-  const isUserLoggedIn = true;
+  const { data: session } = useSession();
 
-  const [providers, setProviders] = useState<Provider | undefined>(undefined);
+  const [providers, setProviders] = useState<
+    Record<string, ClientSafeProvider>
+  >({});
   const [toggleDropdown, setToggleDropdown] = useState(false);
 
   useEffect(() => {
     const fetchProviders = async () => {
-      const fetchedProviders = await getProviders();
+      const res = await getProviders();
 
-      const transformedProviders: Provider = {
-        name: fetchedProviders?.credentials?.name || null,
-        id: fetchedProviders?.id || null,
-      };
+      // Ensure that providers is an object, even if res is null or empty
+      const transformedProviders: Record<string, ClientSafeProvider> =
+        res || {};
 
       setProviders(transformedProviders);
     };
+
     fetchProviders();
   }, []);
 
@@ -46,7 +54,7 @@ const Nav = () => {
 
       {/* Desktop Navigation */}
       <div className='sm:flex hidden'>
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className='flex gap-3 md:gap-5'>
             <Link href={'/create-prompt'} className='black_btn'>
               Create Post
@@ -59,45 +67,51 @@ const Nav = () => {
               Sign Out
             </button>
             <Link href={'/profile'}>
-              <Image
-                src={'/assets/images/logo.svg'}
-                alt='profile_pic'
-                width={37}
-                height={37}
-                className='rounded-full'
-              />
+              {session?.user?.image && (
+                <Image
+                  src={session?.user?.image}
+                  alt='profile_pic'
+                  width={37}
+                  height={37}
+                  className='rounded-full'
+                />
+              )}
             </Link>
           </div>
         ) : (
           <>
             {providers &&
-              Object.values(providers).map((provider) => {
+              Object.values(providers).map((provider) => (
                 <button
                   type='button'
                   key={provider.name}
-                  onClick={() => signIn(provider.id)}
+                  onClick={() => {
+                    signIn(provider.id);
+                  }}
                   className='black_btn'
                 >
-                  Sign In
-                </button>;
-              })}
+                  Sign in
+                </button>
+              ))}
           </>
         )}
       </div>
       {/* Mobile Navigation */}
       <div className='sm:hidden flex relative'>
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className='flex'>
-            <Image
-              src={'/assets/images/logo.svg'}
-              alt='profile_pic'
-              width={37}
-              height={37}
-              className='rounded-full'
-              onClick={() => {
-                setToggleDropdown((prevState) => !prevState);
-              }}
-            />
+            {session?.user?.image && (
+              <Image
+                src={session?.user?.image}
+                alt='profile_pic'
+                width={37}
+                height={37}
+                className='rounded-full'
+                onClick={() => {
+                  setToggleDropdown((prevState) => !prevState);
+                }}
+              />
+            )}
 
             {toggleDropdown && (
               <div className='dropdown'>
