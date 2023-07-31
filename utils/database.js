@@ -11,10 +11,6 @@ const connectToDB = async () => {
   }
 
   try {
-    if (!process.env.MONGODB_URI) {
-      throw new Error('MONGODB_URI environment variable is not set.');
-    }
-
     await mongoose.connect(process.env.MONGODB_URI, {
       dbName: 'share_prompt',
       useNewUrlParser: true,
@@ -28,4 +24,5 @@ const connectToDB = async () => {
     console.log(error);
   }
 };
+
 export default connectToDB;
