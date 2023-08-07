@@ -44,7 +44,7 @@
   height: fit-content;
   z-index: 3;
   width: 100%;
-  max-width: 640px;
+  max-width: 840px;
   background-image: radial-gradient(
       at 27% 37%,
       hsla(215, 98%, 61%, 1) 0px,
@@ -62,7 +62,7 @@
   height: 100%;
   filter: blur(100px) saturate(150%);
   top: 80px;
-  opacity: 0.15;
+  opacity: 0.12;
 }
 
 @media screen and (max-width: 640px) {
