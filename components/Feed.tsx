@@ -7,7 +7,12 @@ const PromptCardList = ({ data }: { data: any[] }) => {
   return (
     <div className='prompt_layout mt-16'>
       {data.map((post) => (
-        <PromptCard />
+        <PromptCard
+          post={post}
+          handleDelete={``}
+          handleEdit={``}
+          handleTagClick={``}
+        />
       ))}
     </div>
   );
@@ -26,7 +31,6 @@ const Feed = () => {
       const res = await fetch('/api/prompt/all');
       const data = await res.json();
       setPosts(data);
-      console.log(data);
     };
     fetchPosts();
   }, []);
